@@ -124,7 +124,7 @@ def extract_search_results(payload: Dict) -> Tuple[Iterable, int]:
 
 
 def identify_mode(
-    name: str, repo: str, user: bool, hacktoberfest: bool
+    name: str, repo: str, user: bool, hacktoberfest: bool, language: str = None
 ) -> Tuple[str, Dict, str]:
     """
     Identify the mode based on arguments passed.
@@ -154,8 +154,11 @@ def identify_mode(
         query = org_query
         variables["name"] = name
         mode = "org"
-
-    if hacktoberfest and not repo:
+    if language is not None:
+        query = search_query
+        variables["queryString"] = f"language:{language}"
+        mode = "search"
+    elif hacktoberfest and not repo:
         query = search_query
         variables["queryString"] = "topic:hacktoberfest "
         if name:
