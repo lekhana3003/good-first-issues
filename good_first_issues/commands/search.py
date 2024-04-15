@@ -32,6 +32,12 @@ console = Console(color_system="auto")
     type=int,
 )
 @click.option(
+    "--language",
+    "-lang",
+    help="Language filter for the issues. Eg: python, javascript",
+    type=str,
+)
+@click.option(
     "--user",
     "-u",
     help="Specify if it's a user repository",
@@ -55,6 +61,7 @@ def search(
     user: bool,
     web: bool,
     limit: int,
+    language: str,
     all: bool,
     hacktoberfest: bool,
 ):
@@ -62,7 +69,7 @@ def search(
     Search for good first issue on organization or users.
     """
 
-    if name is None and hacktoberfest is False:
+    if name is None and (hacktoberfest is False and language is None):
         utils.print_help_msg(search)
         sys.exit()
 
@@ -73,7 +80,9 @@ def search(
     token: Union[str, bool] = utils.check_credential()
 
     # Identify the flags passed.
-    query, variables, mode = services.identify_mode(name, repo, user, hacktoberfest)
+    query, variables, mode = services.identify_mode(
+        name, repo, user, hacktoberfest, language
+    )
 
     # Spinner
     spinner = Halo(text="Fetching repos...", spinner="dots")
